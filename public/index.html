@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Network API Tester</title>
+    <style>
+        :root {
+            --primary-color: #2196F3;
+            --secondary-color: #FFC107;
+            --success-color: #4CAF50;
+            --danger-color: #f44336;
+            --dark-color: #333;
+            --light-color: #f4f4f4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: var(--light-color);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .nav {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .nav-tabs {
+            display: flex;
+            list-style: none;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-tab:hover {
+            background-color: var(--light-color);
+        }
+
+        .nav-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .section {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 5px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #1976D2;
+        }
+
+        .response {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: var(--light-color);
+            border-radius: 3px;
+            white-space: pre-wrap;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 3px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .alert-error {
+            background-color: var(--danger-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>Social Network API Tester</h1>
+    </header>
+
+    <div class="container">
+        <nav class="nav">
+            <ul class="nav-tabs">
+                <li class="nav-tab active" data-section="auth">Auth</li>
+                <li class="nav-tab" data-section="posts">Posts</li>
+                <li class="nav-tab" data-section="users">Users</li>
+                <li class="nav-tab" data-section="comments">Comments</li>
+                <li class="nav-tab" data-section="likes">Likes</li>
+                <li class="nav-tab" data-section="friends">Friends</li>
+                <li class="nav-tab" data-section="stories">Stories</li>
+                <li class="nav-tab" data-section="reels">Reels</li>
+                <li class="nav-tab" data-section="communities">Communities</li>
+                <li class="nav-tab" data-section="events">Events</li>
+                <li class="nav-tab" data-section="chat">Chat</li>
+                <li class="nav-tab" data-section="admin">Admin</li>
+            </ul>
+        </nav>
+
+        <!-- Auth Section -->
+        <section id="auth" class="section active">
+            <h2>Authentication</h2>
+            <div class="form-group">
+                <h3>Login</h3>
+                <form id="loginForm">
+                    <input type="email" placeholder="Email" required>
+                    <input type="password" placeholder="Password" required>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+            <div class="form-group">
+                <h3>Register</h3>
+                <form id="registerForm">
+                    <input type="text" placeholder="Name" required>
+                    <input type="email" placeholder="Email" required>
+                    <input type="password" placeholder="Password" required>
+                    <button type="submit">Register</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Posts Section -->
+        <section id="posts" class="section">
+            <h2>Posts</h2>
+            <div class="form-group">
+                <h3>Create Post</h3>
+                <form id="createPostForm">
+                    <textarea placeholder="Content" required></textarea>
+                    <input type="file" accept="image/*,video/*">
+                    <button type="submit">Create Post</button>
+                </form>
+            </div>
+            <div class="form-group">
+                <h3>News Feed</h3>
+                <button id="loadNewsFeed">Load News Feed</button>
+                <div id="newsFeed" class="response"></div>
+            </div>
+        </section>
+
+        <!-- Add other sections similarly -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <!-- Agregar sección de perfil -->
+    <section id="profile" class="section">
+        <h2>Mi Perfil</h2>
+        <div id="userProfile">
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar"></div>
+                <div class="profile-info">
+                    <h2 id="profileUsername"></h2>
+                    <p id="profileEmail"></p>
+                </div>
+            </div>
+            <div class="profile-stats">
+                <div class="stat-card">
+                    <h3>Posts</h3>
+                    <p id="postsCount">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Amigos</h3>
+                    <p id="friendsCount">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Stories</h3>
+                    <p id="storiesCount">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Reels</h3>
+                    <p id="reelsCount">0</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    </div>
+
+    <script>
+        // Configuración base de la API
+        // Actualiza la configuración base de la API en tu index.html
+        let csrfToken = '';
+        let authToken = '';
+const API_BASE_URL = 'http://localhost:3000';
+
+// Función mejorada para realizar peticiones a la API
+async function apiRequest(endpoint, method = 'GET', body = null) {
+    if (!csrfToken) {
+        try {
+            const csrfResponse = await fetch(`${API_BASE_URL}/api/auth/csrf-token`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+            const csrfData = await csrfResponse.json();
+            csrfToken = csrfData.csrfToken;
+        } catch (error) {
+            console.error('Error obteniendo CSRF token:', error);
+            throw new Error('No se pudo obtener el token CSRF');
+        }
+    }
+
+    const url = `${API_BASE_URL}${endpoint}`;
+    const headers = {
+        'Accept': 'application/json',
+        'X-CSRF-Token': csrfToken
+    };
+
+    if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+    }
+
+    const config = {
+        method,
+        headers,
+        credentials: 'include',
+    };
+
+    if (body) {
+        if (body instanceof FormData) {
+            config.body = body;
+        } else {
+            headers['Content-Type'] = 'application/json';
+            config.body = JSON.stringify(body);
+        }
+    }
+
+    const response = await fetch(url, config);
+    const contentType = response.headers.get('content-type');
+    let data;
+    
+    if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+    } else {
+        data = await response.text();
+    }
+
+    if (!response.ok) {
+        throw new Error(data.message || 'Error en la petición');
+    }
+
+    return data;
+}
+
+
+// Función mejorada para verificar la conexión
+async function checkBackendConnection() {
+    const statusElement = document.createElement('div');
+    statusElement.id = 'connection-status';
+    document.body.insertBefore(statusElement, document.body.firstChild);
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/csrf-token`, {
+            method: 'GET',
+            credentials: 'include',
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            csrfToken = data.csrfToken;
+            statusElement.textContent = '✅ Conectado al backend';
+            statusElement.style.color = 'green';
+            return true;
+        } else {
+            throw new Error('Error en la respuesta del servidor');
+        }
+    } catch (error) {
+        statusElement.textContent = '❌ Error de conexión con el backend';
+        statusElement.style.color = 'red';
+        console.error('Error de conexión:', error);
+        return false;
+    }
+}
+
+        // Función para reintentar la conexión
+        async function retryConnection() {
+            const connected = await checkBackendConnection();
+            if (!connected) {
+                setTimeout(retryConnection, 5000); // Reintentar cada 5 segundos
+            }
+        }
+
+        // Verificar conexión al cargar la página
+        document.addEventListener('DOMContentLoaded', async () => {
+            await retryConnection();
+            
+            // Recuperar token de autenticación si existe
+            const savedToken = localStorage.getItem('authToken');
+            if (savedToken) {
+                authToken = savedToken;
+                document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('disabled'));
+            }
+        });
+
+        // Login mejorado con manejo de errores
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const email = form.querySelector('input[type="email"]').value;
+            const password = form.querySelector('input[type="password"]').value;
+
+            try {
+                // Obtener CSRF token
+                const csrfResponse = await fetch(`${API_BASE_URL}/api/auth/csrf-token`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+                const csrfData = await csrfResponse.json();
+                csrfToken = csrfData.csrfToken;
+
+                // Realizar login
+                const loginResponse = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': csrfToken
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ email, password })
+                });
+
+                const loginData = await loginResponse.json();
+
+                if (!loginResponse.ok) {
+                    throw new Error(loginData.message || 'Error en el inicio de sesión');
+                }
+
+                if (loginData.requiresTwoFactor) {
+                    showAlert('Se requiere verificación de dos factores', 'warning');
+                } else if (loginData.token) {
+                    authToken = loginData.token;
+                    localStorage.setItem('authToken', authToken);
+                    showAlert('Inicio de sesión exitoso', 'success');
+                    
+                    // Cargar perfil del usuario
+                    await loadUserProfile();
+                    
+                    // Cambiar a la sección de perfil
+                    showSection('profile');
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+                console.error('Error de login:', error);
+            }
+        });
+
+        // Función para cargar el perfil del usuario
+        async function loadUserProfile() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al cargar el perfil');
+                }
+
+                const userData = await response.json();
+                
+                // Actualizar la UI con los datos del usuario
+                document.getElementById('profileAvatar').textContent = 
+                    userData.username ? userData.username[0].toUpperCase() : '?';
+                document.getElementById('profileUsername').textContent = userData.username;
+                document.getElementById('profileEmail').textContent = userData.email;
+                document.getElementById('postsCount').textContent = userData.posts?.length || 0;
+                document.getElementById('friendsCount').textContent = userData.friends?.length || 0;
+                document.getElementById('storiesCount').textContent = userData.stories?.length || 0;
+                document.getElementById('reelsCount').textContent = userData.reels?.length || 0;
+
+            } catch (error) {
+                showAlert('Error al cargar el perfil: ' + error.message, 'error');
+            }
+        }
+
+        // Función para mostrar una sección
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Función para mostrar alertas
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `${type}-message`;
+            alertDiv.textContent = message;
+            document.querySelector('.container').insertBefore(
+                alertDiv, 
+                document.querySelector('.container').firstChild
+            );
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+
+       // Registro mejorado
+       document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            try {
+                const formData = {
+                    name: form.querySelector('input[type="text"]').value,
+                    email: form.querySelector('input[type="email"]').value,
+                    password: form.querySelector('input[type="password"]').value
+                };
+
+                await apiRequest('/api/auth/signup', 'POST', formData);
+                showAlert('Registro exitoso. Por favor, inicia sesión.', 'success');
+                form.reset();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        });
+
+        // Crear post con manejo de archivos mejorado
+        document.getElementById('createPostForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData();
+            
+            formData.append('content', form.querySelector('textarea').value);
+            
+            const fileInput = form.querySelector('input[type="file"]');
+            if (fileInput.files.length > 0) {
+                formData.append('media', fileInput.files[0]);
+            }
+
+            try {
+                await apiRequest('/api/posts', 'POST', formData);
+                showAlert('Post creado exitosamente', 'success');
+                form.reset();
+                // Recargar el feed automáticamente
+                loadNewsFeed();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        });
+
+        // Cargar feed de noticias con manejo de errores mejorado
+        async function loadNewsFeed() {
+            try {
+                const feed = await apiRequest('/api/posts/news-feed');
+                const feedContainer = document.getElementById('newsFeed');
+                feedContainer.innerHTML = ''; // Limpiar el contenedor
+
+                feed.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.className = 'post';
+                    postElement.innerHTML = `
+                        <h4>${post.author?.name || 'Usuario'}</h4>
+                        <p>${post.content}</p>
+                        ${post.media ? `<img src="${post.media}" alt="Post media" />` : ''}
+                        <div class="post-actions">
+                            <button onclick="likePost('${post._id}')">Like</button>
+                            <button onclick="commentPost('${post._id}')">Comment</button>
+                        </div>
+                    `;
+                    feedContainer.appendChild(postElement);
+                });
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Verificar autenticación al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedToken = localStorage.getItem('authToken');
+            if (savedToken) {
+                authToken = savedToken;
+                document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('disabled'));
+            }
+        });
+
+        // Función mejorada para mostrar alertas
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(alertDiv, container.firstChild);
+            
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+
+        // Like post
+        async function likePost(postId) {
+            try {
+                await apiRequest(`/api/likes/post/${postId}`, 'POST');
+                showAlert('Like añadido', 'success');
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Comment post
+        async function commentPost(postId) {
+            const comment = prompt('Escribe tu comentario:');
+            if (comment) {
+                try {
+                    await apiRequest('/api/comments', 'POST', {
+                        postId,
+                        content: comment
+                    });
+                    showAlert('Comentario añadido', 'success');
+                } catch (error) {
+                    showAlert(error.message, 'error');
+                }
+            }
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('authToken');
+            authToken = null;
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                if (tab.dataset.section !== 'auth') {
+                    tab.classList.add('disabled');
+                }
+            });
+            showAlert('Sesión cerrada', 'success');
+        }
+    </script>
+</body>
+</html>
