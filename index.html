@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConnectApp - Red Social</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/landing.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">ConnectApp</div>
+        <div class="nav-buttons">
+            <button class="btn btn-login" onclick="redirectToLogin()">Iniciar Sesión</button>
+            <button class="btn btn-register" onclick="redirectToRegister()">Registrarse</button>
+        </div>
+    </nav>
+
+    <main class="hero">
+        <div class="hero-content">
+            <h1>Conecta con el mundo</h1>
+            <p>Únete a nuestra comunidad y comparte momentos especiales con personas de todo el mundo.</p>
+            <div class="cta-buttons">
+                <button class="btn btn-primary" onclick="redirectToRegister()">Comenzar ahora</button>
+                <button class="btn btn-secondary" onclick="redirectToLogin()">Ya tengo cuenta</button>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="assets/social-connection.svg" alt="Conexiones sociales">
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 ConnectApp. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="js/landing.js"></script>
+</body>
+</html>

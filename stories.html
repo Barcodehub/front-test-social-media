@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stories - ConnectApp</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/stories.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+</head>
+<body>
+    <div class="story-viewer">
+        <div class="story-container">
+            <div class="story-header">
+                <div class="story-user-info">
+                    <img src="/api/placeholder/40/40" alt="User" class="profile-pic">
+                    <div class="user-details">
+                        <h4 class="username">Username</h4>
+                        <span class="time">hace 2h</span>
+                    </div>
+                </div>
+                <div class="story-actions">
+                    <button class="action-btn">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    <button class="action-btn close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="story-content">
+                <div class="story-progress">
+                    <!-- Progress bars will be added dynamically -->
+                </div>
+                
+                <div class="story-media">
+                    <!-- Story media content will be loaded here -->
+                </div>
+                
+                <button class="nav-btn prev-btn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="nav-btn next-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Story Modal -->
+    <div id="createStoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Crear Historia</h3>
+                <button class="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createStoryForm">
+                    <div class="media-preview">
+                        <img id="mediaPreview" src="#" alt="Preview" style="display: none;">
+                        <div class="upload-placeholder">
+                            <i class="fas fa-plus"></i>
+                            <span>Agregar foto/video</span>
+                        </div>
+                    </div>
+                    <input type="file" id="mediaInput" accept="image/*, video/*" hidden>
+                    <textarea placeholder="Escribe algo..." class="story-text"></textarea>
+                    <div class="story-options">
+                        <select class="privacy-select">
+                            <option value="public">Público</option>
+                            <option value="friends">Amigos</option>
+                            <option value="private">Privado</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Publicar Historia
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/stories.js"></script>
+</body>
+</html>

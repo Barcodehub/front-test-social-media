@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConnectApp - Home</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/home.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header/Navbar -->
+        <header class="main-header">
+            <div class="header-left">
+                <div class="logo">ConnectApp</div>
+                <div class="search-bar">
+                    <input type="text" placeholder="Buscar...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            <nav class="main-nav">
+                <a href="#" class="nav-item active"><i class="fas fa-home"></i></a>
+                <a href="#" class="nav-item"><i class="fas fa-film"></i></a>
+                <a href="#" class="nav-item"><i class="fas fa-users"></i></a>
+                <a href="#" class="nav-item"><i class="fas fa-bell"></i></a>
+            </nav>
+            <div class="header-right">
+                <button id="create-post-btn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Crear
+                </button>
+                <div class="user-menu">
+                    <img src="/api/placeholder/40/40" alt="Profile" class="profile-pic">
+                    <div class="dropdown-menu">
+                        <a href="/profile.html">Mi Perfil</a>
+                        <a href="/settings.html">Configuración</a>
+
+
+
+
+                        
+                        <a href="#" id="logout-btn">Cerrar Sesión</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="sidebar-left">
+                <nav class="side-nav">
+                    <a href="/profile.html" class="nav-item">
+                        <img src="/api/placeholder/40/40" alt="Profile" class="profile-pic">
+                        <span>Mi Perfil</span>
+                    </a>
+                    <a href="/friends.html" class="nav-item">
+                        <i class="fas fa-user-friends"></i>
+                        <span>Amigos</span>
+                    </a>
+                    <a href="/communities.html" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>Comunidades</span>
+                    </a>
+                    <a href="/events.html" class="nav-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>Eventos</span>
+                    </a>
+                    <a href="/saved.html" class="nav-item">
+                        <i class="fas fa-bookmark"></i>
+                        <span>Guardados</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="content-feed">
+                <!-- Stories Section -->
+                <div class="stories-container">
+                    <div class="story-item create-story">
+                        <div class="story-add">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <span>Crear historia</span>
+                    </div>
+                    <div class="stories-list" id="storiesList">
+                        <!-- Stories will be loaded here dynamically -->
+                    </div>
+                </div>
+
+                <!-- Create Post Section -->
+                <div class="create-post-card">
+                    <div class="post-header">
+                        <img src="/api/placeholder/40/40" alt="Profile" class="profile-pic">
+                        <input type="text" placeholder="¿Qué estás pensando?" id="post-input">
+                    </div>
+                    <div class="post-actions">
+                        <button class="action-btn">
+                            <i class="fas fa-image"></i> Foto/Video
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-user-tag"></i> Etiquetar
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-map-marker-alt"></i> Ubicación
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Posts Feed -->
+                <div class="posts-container" id="postsFeed">
+                    <!-- Posts will be loaded here dynamically -->
+                </div>
+            </div>
+
+            <div class="sidebar-right">
+                <!-- Friend Requests -->
+                <div class="widget friend-requests">
+                    <h3>Solicitudes de Amistad</h3>
+                    <div id="friendRequestsList">
+                        <!-- Friend requests will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Upcoming Events -->
+                <div class="widget upcoming-events">
+                    <h3>Próximos Eventos</h3>
+                    <div id="eventsList">
+                        <!-- Events will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Active Friends -->
+                <div class="widget active-friends">
+                    <h3>Amigos Activos</h3>
+                    <div id="activeFriendsList">
+                        <!-- Active friends will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="createPostModal" class="modal">
+        <!-- Create post modal content -->
+    </div>
+
+    <div id="storyViewerModal" class="modal">
+        <!-- Story viewer modal content -->
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/home.js"></script>
+</body>
+</html>

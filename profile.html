@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - ConnectApp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="css/profile.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Reutilizamos el header del home -->
+        <header class="main-header">
+            <!-- ... header content ... -->
+        </header>
+
+        <main class="profile-content">
+            <!-- Portada y foto de perfil -->
+            <div class="profile-header">
+                <div class="cover-photo">
+                    <img src="/api/placeholder/1200/300" alt="Cover photo" id="coverPhoto">
+                    <button class="edit-cover-btn" id="editCoverBtn">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                </div>
+                <div class="profile-info-container">
+                    <div class="profile-picture">
+                        <img src="/api/placeholder/150/150" alt="Profile picture" id="profilePicture">
+                        <button class="edit-profile-pic-btn" id="editProfilePicBtn">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="profile-info">
+                        <h1 id="username">Nombre de Usuario</h1>
+                        <p id="userBio">Biografía del usuario</p>
+                        <div class="profile-stats">
+                            <div class="stat">
+                                <span id="postsCount">0</span> Publicaciones
+                            </div>
+                            <div class="stat">
+                                <span id="friendsCount">0</span> Amigos
+                            </div>
+                            <div class="stat">
+                                <span id="communitiesCount">0</span> Comunidades
+                            </div>
+                        </div>
+                    </div>
+                    <button id="editProfileBtn" class="edit-profile-btn">
+                        <i class="fas fa-edit"></i> Editar Perfil
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenido del perfil -->
+            <div class="profile-content-container">
+                <!-- Navegación del perfil -->
+                <nav class="profile-nav">
+                    <button class="nav-btn active" data-section="posts">
+                        <i class="fas fa-th"></i> Publicaciones
+                    </button>
+                    <button class="nav-btn" data-section="reels">
+                        <i class="fas fa-film"></i> Reels
+                    </button>
+                    <button class="nav-btn" data-section="friends">
+                        <i class="fas fa-user-friends"></i> Amigos
+                    </button>
+                    <button class="nav-btn" data-section="communities">
+                        <i class="fas fa-users"></i> Comunidades
+                    </button>
+                </nav>
+
+                <!-- Contenedor dinámico para las secciones -->
+                <div class="profile-sections">
+                    <!-- Sección de publicaciones -->
+                    <div id="postsSection" class="section active">
+                        <div class="posts-grid" id="userPosts">
+                            <!-- Los posts se cargarán dinámicamente aquí -->
+                        </div>
+                    </div>
+
+                    <!-- Sección de reels -->
+                    <div id="reelsSection" class="section">
+                        <div class="reels-grid" id="userReels">
+                            <!-- Los reels se cargarán dinámicamente aquí -->
+                        </div>
+                    </div>
+
+                    <!-- Sección de amigos -->
+                    <div id="friendsSection" class="section">
+                        <div class="friends-grid" id="userFriends">
+                            <!-- Los amigos se cargarán dinámicamente aquí -->
+                        </div>
+                    </div>
+
+                    <!-- Sección de comunidades -->
+                    <div id="communitiesSection" class="section">
+                        <div class="communities-grid" id="userCommunities">
+                            <!-- Las comunidades se cargarán dinámicamente aquí -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de edición de perfil -->
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Editar Perfil</h2>
+            <form id="editProfileForm">
+                <div class="form-group">
+                    <label for="editUsername">Nombre de usuario</label>
+                    <input type="text" id="editUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">Email</label>
+                    <input type="email" id="editEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="editBio">Biografía</label>
+                    <textarea id="editBio" name="bio"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editPrivacy">Privacidad del perfil</label>
+                    <select id="editPrivacy" name="privacy">
+                        <option value="public">Público</option>
+                        <option value="friends">Solo amigos</option>
+                        <option value="private">Privado</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Guardar cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/profile.js"></script>
+</body>
+</html>
