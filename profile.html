@@ -18,18 +18,38 @@
             <!-- Portada y foto de perfil -->
             <div class="profile-header">
                 <div class="cover-photo">
-                    <img src="/api/placeholder/1200/300" alt="Cover photo" id="coverPhoto">
+                    <img src="/assets/profile/portada.jpg" alt="Cover photo" id="coverPhoto">
                     <button class="edit-cover-btn" id="editCoverBtn">
                         <i class="fas fa-camera"></i>
                     </button>
                 </div>
                 <div class="profile-info-container">
                     <div class="profile-picture">
-                        <img src="/api/placeholder/150/150" alt="Profile picture" id="profilePicture">
-                        <button class="edit-profile-pic-btn" id="editProfilePicBtn">
-                            <i class="fas fa-camera"></i>
-                        </button>
-                    </div>
+                        <img 
+                          id="profileImage" 
+                          src="/assets/profile/default-profile.png" 
+                          alt="Foto de perfil"
+                          class="profile-img"
+                        >
+                        <div class="profile-picture-overlay">
+                          <input 
+                            type="file" 
+                            id="profilePictureInput" 
+                            accept="image/*" 
+                            class="hidden"
+                          >
+                        </div>
+                      </div>
+                      <button 
+                      id="changeProfilePicture" 
+                      class="edit-picture-btn"
+                    >
+                      <i class="fas fa-camera"></i>
+                      Cambiar foto
+                    </button>
+
+
+
                     <div class="profile-info">
                         <h1 id="username">Nombre de Usuario</h1>
                         <p id="userBio">Biografía del usuario</p>

@@ -12,7 +12,7 @@ function checkAuth() {
     }
     return token;
 }
-
+document.addEventListener('DOMContentLoaded', getCsrfToken);
 // Get CSRF token
 async function getCsrfToken() {
     try {

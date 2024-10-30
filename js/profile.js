@@ -1,10 +1,223 @@
 // Constants
 const API_BASE_URL = 'http://localhost:3000/api';
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB en bytes
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+// Elementos del DOM
+const profileImage = document.getElementById('profileImage');
+const profilePictureInput = document.getElementById('profilePictureInput');
+const changeProfilePictureBtn = document.getElementById('changeProfilePicture');
+
+// Estado global
+let csrfToken = null;
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        await getCsrfToken();
+        await loadCurrentProfilePicture();
+        setupEventListeners();
+    } catch (error) {
+        console.error('Error durante la inicialización:', error);
+        showError('Error al inicializar la aplicación');
+    }
+});
+
+// Obtener CSRF token
+async function getCsrfToken() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/csrf-token`, {
+            method: 'GET',
+            credentials: 'include',  // Importante: incluir cookies
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        csrfToken = data.csrfToken;
+        
+        if (!csrfToken) {
+            throw new Error('No se recibió el token CSRF');
+        }
+    } catch (error) {
+        console.error('Error al obtener el token CSRF:', error);
+        throw new Error('Error al inicializar la seguridad');
+    }
+}
+
+// Cargar la foto de perfil actual
+async function loadCurrentProfilePicture() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/profile`, {
+            headers: getHeaders()
+        });
+        
+        if (response.ok) {
+            const userData = await response.json();
+            if (userData.profilePicture) {
+                profileImage.src = userData.profilePicture;
+            }
+        }
+    } catch (error) {
+        console.error('Error al cargar la foto de perfil:', error);
+    }
+}
+
+// Configurar event listeners
+function setupEventListeners() {
+    changeProfilePictureBtn.addEventListener('click', () => {
+        profilePictureInput.click();
+    });
+
+    profilePictureInput.addEventListener('change', handleFileSelection);
+}
+
+// Manejar la selección de archivo
+async function handleFileSelection(event) {
+    const file = event.target.files[0];
+    
+    if (!file) return;
+
+    // Validar el archivo
+    const validationError = validateFile(file);
+    if (validationError) {
+        showError(validationError);
+        profilePictureInput.value = ''; // Limpiar input
+        return;
+    }
+
+    // Mostrar preview
+    showImagePreview(file);
+
+    // Subir imagen
+    await uploadProfilePicture(file);
+}
+
+// Validar archivo
+function validateFile(file) {
+    if (!ALLOWED_TYPES.includes(file.type)) {
+        return 'El formato de archivo no es válido. Por favor, usa JPG, PNG, GIF o WebP.';
+    }
+    
+    if (file.size > MAX_FILE_SIZE) {
+        return 'La imagen es demasiado grande. El tamaño máximo es 5MB.';
+    }
+
+    return null;
+}
+
+// Mostrar preview de la imagen
+function showImagePreview(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        profileImage.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// Subir la foto de perfil
+async function uploadProfilePicture(file) {
+    try {
+        showLoader();
+
+        if (!csrfToken) {
+            await getCsrfToken(); // Intentar obtener nuevo token si no existe
+        }
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const response = await fetch(`${API_BASE_URL}/users/profile-picture`, {
+            method: 'PUT',
+            credentials: 'include', // Importante: incluir cookies
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'X-CSRF-Token': csrfToken
+                // No incluir Content-Type cuando se usa FormData
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Error al subir la imagen');
+        }
+
+        const data = await response.json();
+        profileImage.src = data.profilePicture;
+        showSuccess('Foto de perfil actualizada exitosamente');
+        
+    } catch (error) {
+        console.error('Error al subir la foto de perfil:', error);
+        if (error.message.includes('CSRF')) {
+            // Si es un error de CSRF, intentar renovar el token y reintentar una vez
+            try {
+                await getCsrfToken();
+                return uploadProfilePicture(file); // Reintentar la subida
+            } catch (retryError) {
+                showError('Error de seguridad. Por favor, recarga la página.');
+            }
+        } else {
+            showError('Error al actualizar la foto de perfil');
+        }
+        await loadCurrentProfilePicture(); // Recargar la imagen anterior
+    } finally {
+        hideLoader();
+        profilePictureInput.value = ''; // Limpiar input
+    }
+}
+
+// Utilidades para los headers
+function getHeaders(isFileUpload = false) {
+    const headers = {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+    };
+
+    if (csrfToken) {
+        headers['X-CSRF-Token'] = csrfToken;
+    }
+
+    // No incluir Content-Type para subidas de archivo
+    if (!isFileUpload) {
+        headers['Content-Type'] = 'application/json';
+    }
+
+    return headers;
+}
+
+// Funciones de UI
+function showLoader() {
+    // Implementa tu loader aquí
+    changeProfilePictureBtn.disabled = true;
+    changeProfilePictureBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
+}
+
+function hideLoader() {
+    changeProfilePictureBtn.disabled = false;
+    changeProfilePictureBtn.innerHTML = '<i class="fas fa-camera"></i> Cambiar foto';
+}
+
+function showError(message) {
+    // Implementa tu sistema de notificaciones aquí
+    alert(message); // Reemplaza esto con tu sistema de notificaciones
+}
+
+function showSuccess(message) {
+    // Implementa tu sistema de notificaciones aquí
+    alert(message); // Reemplaza esto con tu sistema de notificaciones
+}
+
+
 const headers = {
-    'Content-Type': 'application/json',
-    'X-CSRF-Token': localStorage.getItem('csrfToken'),
+    'X-CSRF-Token': csrfToken,
     'Authorization': `Bearer ${localStorage.getItem('token')}`
 };
+
 
 // DOM Elements
 const profileElements = {
@@ -210,7 +423,144 @@ document.getElementById('editProfilePictureForm').addEventListener('submit', asy
 });
 
 
+// profile.js
 
+class ProfileManager {
+  constructor() {
+    this.profilePicture = document.getElementById('profilePicture');
+    this.editProfilePicBtn = document.getElementById('editProfilePicBtn');
+    this.profilePicInput = document.getElementById('profilePicInput');
+    this.apiUrl = '/api/users'; // Ajusta esto según tu URL base de la API
+    
+    this.initializeEventListeners();
+    this.loadProfilePicture();
+  }
+
+  initializeEventListeners() {
+    this.editProfilePicBtn.addEventListener('click', () => this.openFileSelector());
+    this.profilePicInput.addEventListener('change', (e) => this.handleFileSelection(e));
+  }
+
+  openFileSelector() {
+    this.profilePicInput.click();
+  }
+
+  async loadProfilePicture() {
+    try {
+      const response = await this.fetchWithAuth(`${this.apiUrl}/me`);
+      const data = await response.json();
+      
+      if (data.user?.profilePicture?.url) {
+        this.updateProfilePictureDisplay(data.user.profilePicture.url);
+      }
+    } catch (error) {
+      console.error('Error al cargar la foto de perfil:', error);
+      this.showError('No se pudo cargar la foto de perfil');
+    }
+  }
+
+  async handleFileSelection(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!this.validateFile(file)) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await this.fetchWithAuth(`${this.apiUrl}/profile-picture`, {
+        method: 'PUT',
+        body: formData
+      });
+
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        this.updateProfilePictureDisplay(data.data.user.profilePicture.url);
+        this.showSuccess('Foto de perfil actualizada correctamente');
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      console.error('Error al actualizar la foto de perfil:', error);
+      this.showError('Error al actualizar la foto de perfil');
+    }
+
+    // Limpiar el input para permitir seleccionar el mismo archivo nuevamente
+    this.profilePicInput.value = '';
+  }
+
+  validateFile(file) {
+    if (!file.type.startsWith('image/')) {
+      this.showError('Por favor selecciona una imagen válida');
+      return false;
+    }
+
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      this.showError('La imagen no debe superar los 5MB');
+      return false;
+    }
+
+    return true;
+  }
+
+  updateProfilePictureDisplay(url) {
+    this.profilePicture.src = url;
+  }
+
+  async fetchWithAuth(url, options = {}) {
+    const token = localStorage.getItem('token');
+    const headers = new Headers(options.headers || {});
+    
+    if (token) {
+      headers.append('Authorization', `Bearer ${token}`);
+    }
+
+    return fetch(url, {
+      ...options,
+      headers
+    });
+  }
+
+  showSuccess(message) {
+    // Aquí puedes implementar tu lógica de notificación de éxito
+    // Por ejemplo, usando una librería de notificaciones o un alert simple
+    alert(message);
+  }
+
+  showError(message) {
+    // Aquí puedes implementar tu lógica de notificación de error
+    // Por ejemplo, usando una librería de notificaciones o un alert simple
+    alert(message);
+  }
+
+  async deleteProfilePicture() {
+    try {
+      const response = await this.fetchWithAuth(`${this.apiUrl}/profile-picture`, {
+        method: 'DELETE'
+      });
+
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        this.updateProfilePictureDisplay('/api/placeholder/150/150');
+        this.showSuccess('Foto de perfil eliminada correctamente');
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      console.error('Error al eliminar la foto de perfil:', error);
+      this.showError('Error al eliminar la foto de perfil');
+    }
+  }
+}
+
+// Inicializar el gestor de perfil cuando el DOM esté cargado
+document.addEventListener('DOMContentLoaded', () => {
+  window.profileManager = new ProfileManager();
+});
 // UI Helpers
 function switchSection(sectionId) {
     profileElements.navButtons.forEach(btn => {
@@ -237,7 +587,7 @@ function createPostHTML(post) {
     return `
         <div class="post-card" data-id="${post._id}">
             <div class="post-header">
-                <img src="${post.author.profilePicture || '/api/placeholder/40/40'}" alt="Profile" class="profile-pic">
+                <img src="${post.author.profilePicture || '/assets/profile/default-profile.png'}" alt="Profile" class="profile-pic">
                 <div class="post-info">
                     <h4>${post.author.username}</h4>
                     <span>${new Date(post.createdAt).toLocaleDateString()}</span>
