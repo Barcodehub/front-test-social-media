@@ -18,11 +18,18 @@
             <!-- Portada y foto de perfil -->
             <div class="profile-header">
                 <div class="cover-photo">
+                    <!-- Imagen de portada con id necesario para JavaScript -->
                     <img src="/assets/profile/portada.jpg" alt="Cover photo" id="coverPhoto">
+                  
+                    <!-- Botón para editar la foto de portada, con el id para el evento -->
                     <button class="edit-cover-btn" id="editCoverBtn">
-                        <i class="fas fa-camera"></i>
+                      <i class="fas fa-camera"></i>
                     </button>
-                </div>
+                  
+                    <!-- Input de archivo oculto para seleccionar la nueva portada -->
+                    <input type="file" id="coverPhotoInput" accept="image/*" style="display: none;">
+                  </div>
+                  
                 <div class="profile-info-container">
                     <div class="profile-picture">
                         <img 

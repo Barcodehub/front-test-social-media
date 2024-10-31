@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         await getCsrfToken();
         await loadCurrentProfilePicture();
+        await loadCurrentCoverPicture();
         setupEventListeners();
     } catch (error) {
         console.error('Error durante la inicialización:', error);
@@ -190,6 +191,122 @@ function getHeaders(isFileUpload = false) {
     return headers;
 }
 
+
+//CONFIGURACION PARA LA PORTADA
+
+
+const coverPhoto = document.getElementById('coverPhoto');
+const coverPhotoInput = document.getElementById('coverPhotoInput');
+const editCoverBtn = document.getElementById('editCoverBtn');
+
+// Configurar event listeners
+editCoverBtn.addEventListener('click', () => {
+  coverPhotoInput.click();
+});
+
+coverPhotoInput.addEventListener('change', async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Validar el archivo
+  const validationError = validateFile(file);
+  if (validationError) {
+    showError(validationError);
+    coverPhotoInput.value = ''; // Limpiar input
+    return;
+  }
+
+  // Mostrar preview
+  showCoverPhotoPreview(file);
+
+  // Subir imagen
+  await uploadCoverPicture(file);
+});
+
+async function uploadCoverPicture(file) {
+  try {
+    showLoader();
+
+    if (!csrfToken) {
+      await getCsrfToken(); // Intentar obtener nuevo token si no existe
+    }
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const response = await fetch(`${API_BASE_URL}/users/cover-picture`, {
+      method: 'PUT',
+      credentials: 'include', // Importante: incluir cookies
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'X-CSRF-Token': csrfToken
+        // No incluir Content-Type cuando se usa FormData
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Error al subir la imagen');
+    }
+
+    const data = await response.json();
+    coverPhoto.src = data.coverPicture;
+    showSuccess('Foto de portada actualizada exitosamente');
+  } catch (error) {
+    console.error('Error al subir la foto de portada:', error);
+    if (error.message.includes('CSRF')) {
+      // Si es un error de CSRF, intentar renovar el token y reintentar una vez
+      try {
+        await getCsrfToken();
+        return uploadCoverPicture(file); // Reintentar la subida
+      } catch (retryError) {
+        showError('Error de seguridad. Por favor, recarga la página.');
+      }
+    } else {
+      showError('Error al actualizar la foto de portada');
+    }
+    await loadCurrentCoverPicture(); // Recargar la imagen anterior
+  } finally {
+    hideLoader();
+    coverPhotoInput.value = ''; // Limpiar input
+  }
+}
+
+async function loadCurrentCoverPicture() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/profile`, {
+      headers: getHeaders()
+    });
+
+    if (response.ok) {
+      const userData = await response.json();
+      if (userData.coverPicture) {
+        coverPhoto.src = userData.coverPicture;
+      }
+    }
+  } catch (error) {
+    console.error('Error al cargar la foto de portada:', error);
+  }
+}
+
+
+function showCoverPhotoPreview(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    coverPhoto.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+
+
+
+
+
+
+
+
 // Funciones de UI
 function showLoader() {
     // Implementa tu loader aquí
@@ -257,6 +374,7 @@ async function initializeProfile() {
 
 // Fetch User Profile
 async function fetchUserProfile() {
+
     try {
         const response = await fetch(`${API_BASE_URL}/users/profile`, {
             headers
@@ -286,21 +404,36 @@ function updateProfileUI(profile) {
 }
 
 // Handle Profile Update
+// Handle Profile Update
 async function handleProfileUpdate(event) {
     event.preventDefault();
     
-    const formData = new FormData(profileElements.editProfileForm);
-    const updateData = Object.fromEntries(formData.entries());
-    
     try {
+        // Obtén el token CSRF antes de hacer la solicitud
+        await getCsrfToken();
+        
+        // Extrae los datos del formulario
+        const formData = new FormData(profileElements.editProfileForm);
+        const updateData = Object.fromEntries(formData.entries());
+
+        // Agrega el token CSRF a los encabezados
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken,  // Token CSRF obtenido
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        };
+        
+        // Envía la solicitud de actualización
         const response = await fetch(`${API_BASE_URL}/users/profile`, {
             method: 'PUT',
             headers,
+            credentials: 'include',  // Importante: incluir cookies
             body: JSON.stringify(updateData)
         });
-        
+
         if (!response.ok) throw new Error('Error updating profile');
         
+        // Actualiza la interfaz con el perfil actualizado
         const updatedProfile = await response.json();
         updateProfileUI(updatedProfile);
         closeEditProfileModal();
@@ -310,6 +443,7 @@ async function handleProfileUpdate(event) {
         showError('Error al actualizar el perfil');
     }
 }
+
 
 // Load Section Content
 async function loadSectionContent(section) {
@@ -385,42 +519,8 @@ async function loadUserCommunities() {
 }
 
 
-// Abre el modal de edición de foto de perfil
-document.getElementById('editProfilePicBtn').addEventListener('click', () => {
-    document.getElementById('editProfilePictureModal').style.display = 'block';
-});
 
-// Cierra el modal al hacer clic en la "x"
-document.querySelector('.close').addEventListener('click', () => {
-    document.getElementById('editProfilePictureModal').style.display = 'none';
-});
 
-// Maneja el envío del formulario para la foto de perfil
-document.getElementById('editProfilePictureForm').addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const token = checkAuth(); // Obtiene el token de autenticación
-
-    try {
-        const response = await fetch(`${API_URL}/users/profile-picture`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
-            body: formData
-        });
-
-        if (!response.ok) throw new Error('Error al actualizar la foto de perfil');
-
-        const data = await response.json();
-        document.getElementById('profilePicture').src = data.imageUrl; // Actualiza la imagen de perfil en la interfaz
-        document.getElementById('editProfilePictureModal').style.display = 'none'; // Cierra el modal
-        alert('Foto de perfil actualizada exitosamente');
-    } catch (error) {
-        console.error('Error al actualizar la foto de perfil:', error);
-        alert('Hubo un error al actualizar la foto de perfil');
-    }
-});
 
 
 // profile.js
@@ -431,130 +531,14 @@ class ProfileManager {
     this.editProfilePicBtn = document.getElementById('editProfilePicBtn');
     this.profilePicInput = document.getElementById('profilePicInput');
     this.apiUrl = '/api/users'; // Ajusta esto según tu URL base de la API
-    
-    this.initializeEventListeners();
-    this.loadProfilePicture();
   }
 
-  initializeEventListeners() {
-    this.editProfilePicBtn.addEventListener('click', () => this.openFileSelector());
-    this.profilePicInput.addEventListener('change', (e) => this.handleFileSelection(e));
-  }
+
 
   openFileSelector() {
     this.profilePicInput.click();
   }
 
-  async loadProfilePicture() {
-    try {
-      const response = await this.fetchWithAuth(`${this.apiUrl}/me`);
-      const data = await response.json();
-      
-      if (data.user?.profilePicture?.url) {
-        this.updateProfilePictureDisplay(data.user.profilePicture.url);
-      }
-    } catch (error) {
-      console.error('Error al cargar la foto de perfil:', error);
-      this.showError('No se pudo cargar la foto de perfil');
-    }
-  }
-
-  async handleFileSelection(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    if (!this.validateFile(file)) return;
-
-    try {
-      const formData = new FormData();
-      formData.append('image', file);
-
-      const response = await this.fetchWithAuth(`${this.apiUrl}/profile-picture`, {
-        method: 'PUT',
-        body: formData
-      });
-
-      const data = await response.json();
-      
-      if (data.status === 'success') {
-        this.updateProfilePictureDisplay(data.data.user.profilePicture.url);
-        this.showSuccess('Foto de perfil actualizada correctamente');
-      } else {
-        throw new Error(data.message);
-      }
-    } catch (error) {
-      console.error('Error al actualizar la foto de perfil:', error);
-      this.showError('Error al actualizar la foto de perfil');
-    }
-
-    // Limpiar el input para permitir seleccionar el mismo archivo nuevamente
-    this.profilePicInput.value = '';
-  }
-
-  validateFile(file) {
-    if (!file.type.startsWith('image/')) {
-      this.showError('Por favor selecciona una imagen válida');
-      return false;
-    }
-
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
-      this.showError('La imagen no debe superar los 5MB');
-      return false;
-    }
-
-    return true;
-  }
-
-  updateProfilePictureDisplay(url) {
-    this.profilePicture.src = url;
-  }
-
-  async fetchWithAuth(url, options = {}) {
-    const token = localStorage.getItem('token');
-    const headers = new Headers(options.headers || {});
-    
-    if (token) {
-      headers.append('Authorization', `Bearer ${token}`);
-    }
-
-    return fetch(url, {
-      ...options,
-      headers
-    });
-  }
-
-  showSuccess(message) {
-    // Aquí puedes implementar tu lógica de notificación de éxito
-    // Por ejemplo, usando una librería de notificaciones o un alert simple
-    alert(message);
-  }
-
-  showError(message) {
-    // Aquí puedes implementar tu lógica de notificación de error
-    // Por ejemplo, usando una librería de notificaciones o un alert simple
-    alert(message);
-  }
-
-  async deleteProfilePicture() {
-    try {
-      const response = await this.fetchWithAuth(`${this.apiUrl}/profile-picture`, {
-        method: 'DELETE'
-      });
-
-      const data = await response.json();
-      
-      if (data.status === 'success') {
-        this.updateProfilePictureDisplay('/api/placeholder/150/150');
-        this.showSuccess('Foto de perfil eliminada correctamente');
-      } else {
-        throw new Error(data.message);
-      }
-    } catch (error) {
-      console.error('Error al eliminar la foto de perfil:', error);
-      this.showError('Error al eliminar la foto de perfil');
-    }
-  }
 }
 
 // Inicializar el gestor de perfil cuando el DOM esté cargado
@@ -596,7 +580,7 @@ function createPostHTML(post) {
             <div class="post-content">${post.content}</div>
             <div class="post-actions">
                 <button class="like-btn" onclick="handleLike('${post._id}', 'post')">
-                    <i class="fas fa-heart"></i> ${post.likes.length}
+                    <i class="fas fa-heart"></i><span class="likes-count"> ${post.likes.length}</span>
                 </button>
                 <button class="comment-btn" onclick="handleComment('${post._id}')">
                     <i class="fas fa-comment"></i> ${post.comments.length}
@@ -646,26 +630,71 @@ function createCommunityHTML(community) {
 }
 
 // Interaction Handlers
+
+
+function getHeaders2() {
+    const token = localStorage.getItem('token');
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : '',
+        'X-CSRF-Token': csrfToken
+    };
+}
 async function handleLike(contentId, type) {
     try {
-        const response = await fetch(`${API_BASE_URL}/${type}s/${contentId}/like`, {
-            method: 'POST',
-            headers
-        });
-        
-        if (!response.ok) throw new Error('Error al dar like');
-        
-        const updatedContent = await response.json();
-        const likeButton = document.querySelector(`[data-id="${contentId}"] .like-btn`);
-        if (likeButton) {
-            const likesCount = likeButton.querySelector('i + span') || likeButton;
-            likesCount.textContent = ` ${updatedContent.likes.length}`;
+        const token = localStorage.getItem('token');
+        if (!token) {
+            showError('Debes iniciar sesión para dar like');
+            return;
         }
+        const response = await fetch(`${API_BASE_URL}/likes/${type}/${contentId}`, {
+            method: 'POST',
+            headers: getHeaders2(),
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al dar like');
+        }
+
+        const updatedContent = await response.json();
+        updateLikeButton(contentId, updatedContent.likes.length);
+
     } catch (error) {
         console.error('Error:', error);
-        showError('Error al procesar el like');
+        showError(error.message || 'Error al procesar el like');
     }
 }
+
+// Función auxiliar para actualizar el botón de like
+function updateLikeButton(contentId, likesCount) {
+    const postCard = document.querySelector(`[data-id="${contentId}"]`);
+    if (postCard) {
+        const likesCountSpan = postCard.querySelector('.likes-count');
+        if (likesCountSpan) {
+            likesCountSpan.textContent = ` ${likesCount}`;
+        }
+    }
+}
+
+// Función auxiliar para mostrar errores
+function showError(message) {
+    // Implementa aquí tu lógica de mostrar errores
+    console.error(message);
+    // Ejemplo: alert(message);
+}
+
+
+
+
+
+
+
+
+
+
+
 
 async function handleComment(contentId) {
     const commentText = prompt('Escribe tu comentario:');
@@ -714,9 +743,9 @@ const fileUploadHandlers = {
     coverPhoto: document.getElementById('editCoverBtn')
 };
 
-Object.entries(fileUploadHandlers).forEach(([type, button]) => {
+/* Object.entries(fileUploadHandlers).forEach(([type, button]) => {
     button.addEventListener('click', () => handleFileUpload(type));
-});
+}); */
 
 async function handleFileUpload(type) {
     const input = document.createElement('input');
