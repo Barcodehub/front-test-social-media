@@ -371,6 +371,7 @@ async function initializeProfile() {
         const userProfile = await fetchUserProfile();
         updateProfileUI(userProfile);
         await loadInitialContent();
+
     } catch (error) {
         console.error('Error initializing profile:', error);
         showError('Error al cargar el perfil');
@@ -523,6 +524,25 @@ async function loadUserCommunities() {
     }
 }
 
+async function viewProfile(slug) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/${slug}`, { headers });
+        if (!response.ok) throw new Error('No se pudo cargar el perfil');
+
+        const data = await response.json();
+
+        if (data.status === 'success') {
+            // Llama a una función para mostrar el perfil en la interfaz
+            displayProfile(data.data);
+        } else {
+            console.error(data.message);
+            alert(data.message);
+        }
+    } catch (error) {
+        console.error('Error al cargar el perfil:', error);
+        alert('Error al cargar el perfil');
+    }
+}
 
 
 
@@ -611,12 +631,7 @@ function showCommentsModal(comments) {
                                 <small>${new Date(comment.createdAt).toLocaleDateString()}</small>
                             </div>
                         </div>
-
-
-                            
-                                
-                                
-                            </div>
+                         </div>
                         `).join('')
                         : '<p>No hay comentarios aún</p>'
                     }
@@ -679,6 +694,30 @@ function createPostHTML(post) {
     `;
 }
 
+function displayProfile(user) {
+    // Ocultar el perfil actual del usuario para mostrar el perfil del amigo
+    document.querySelector('.profile-content').style.display = 'none';
+
+    const profileContainer = document.getElementById('profileContainer');
+    profileContainer.style.display = 'block'; // Mostrar el contenedor del amigo
+
+    profileContainer.innerHTML = `
+        <div class="profile-card">
+            <img src="${user.profilePicture || '/assets/profile/default-profile.png'}" alt="${user.username}" class="profile-pic">
+            <h2>${user.username}</h2>
+            ${user.bio ? `<p>${user.bio}</p>` : ''}
+            <div class="profile-stats">
+                <div class="stat">Posts: ${user.posts ? user.posts.length : 0}</div>
+                <div class="stat">Friends: ${user.friends ? user.friends.length : 0}</div>
+                <div class="stat">Communities: ${user.community ? user.community.length : 0}</div>
+            </div>
+            <button onclick="backToMainProfile()">Regresar a mi perfil</button>
+        </div>
+    `;
+}
+
+
+
 
 function createReelHTML(reel) {
     return `
@@ -697,9 +736,9 @@ function createReelHTML(reel) {
 function createFriendHTML(friend) {
     return `
         <div class="friend-card" data-id="${friend._id}">
-            <img src="${friend.profilePicture || '/api/placeholder/100/100'}" alt="${friend.username}">
+            <img src="${friend.profilePicture || '/assets/profile/default-profile.png'}" alt="${friend.username}" class="profile-pic">
             <h4>${friend.username}</h4>
-            <button class="btn-primary" onclick="viewProfile('${friend._id}')">Ver perfil</button>
+            <button class="btn-primary" onclick="viewfriend('${friend.slug}')">Ver perfil</button>
         </div>
     `;
 }
@@ -959,6 +998,11 @@ async function deleteComment(commentId) {
 function viewProfile(userId) {
     window.location.href = `/profile.html?id=${userId}`;
 }
+
+function viewfriend(slug) {
+    window.location.href = `/user-profile.html?slug=${slug}`;
+}
+
 
 function viewCommunity(communityId) {
     window.location.href = `/community.html?id=${communityId}`;

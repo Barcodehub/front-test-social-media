@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Perfil - ConnectApp</title>
+    <title>Perfil de Usuario - ConnectApp</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="css/profile.css">
     <link rel="stylesheet" href="css/comments.css">
@@ -19,17 +19,8 @@
             <!-- Portada y foto de perfil -->
             <div class="profile-header">
                 <div class="cover-photo">
-                    <!-- Imagen de portada con id necesario para JavaScript -->
                     <img src="/assets/profile/default-cover.jpg" alt="Cover photo" id="coverPhoto">
-                  
-                    <!-- Botón para editar la foto de portada, con el id para el evento -->
-                    <button class="edit-cover-btn" id="editCoverBtn">
-                      <i class="fas fa-camera"></i>
-                    </button>
-                  
-                    <!-- Input de archivo oculto para seleccionar la nueva portada -->
-                    <input type="file" id="coverPhotoInput" accept="image/*" style="display: none;">
-                  </div>
+                </div>
                   
                 <div class="profile-info-container">
                     <div class="profile-picture">
@@ -39,24 +30,7 @@
                           alt="Foto de perfil"
                           class="profile-img"
                         >
-                        <div class="profile-picture-overlay">
-                          <input 
-                            type="file" 
-                            id="profilePictureInput" 
-                            accept="image/*" 
-                            class="hidden"
-                          >
-                        </div>
-                      </div>
-                      <button 
-                      id="changeProfilePicture" 
-                      class="edit-picture-btn"
-                    >
-                      <i class="fas fa-camera"></i>
-                      Cambiar foto
-                    </button>
-
-
+                    </div>
 
                     <div class="profile-info">
                         <h1 id="username">Nombre de Usuario</h1>
@@ -72,19 +46,20 @@
                                 <span id="communitiesCount">0</span> Comunidades
                             </div>
                         </div>
+                        <!-- Botones de interacción con el usuario -->
+                        <div class="profile-actions">
+                            <button id="friendActionBtn" class="btn-primary">
+                                <i class="fas fa-user-plus"></i> 
+                                <span>Agregar amigo</span>
+                            </button>
+                            <button id="messageBtn" class="btn-secondary">
+                                <i class="fas fa-envelope"></i> 
+                                Mensaje
+                            </button>
+                        </div>
                     </div>
-                    <button id="editProfileBtn" class="edit-profile-btn">
-                        <i class="fas fa-edit"></i> Editar Perfil
-                    </button>
                 </div>
             </div>
-
-            <!-- Contenedor para mostrar el perfil del amigo -->
-<div id="profileContainer" class="profile-view-container" style="display: none;">
-    <!-- El contenido del perfil del amigo se cargará aquí -->
-</div>
-
-
 
             <!-- Contenido del perfil -->
             <div class="profile-content-container">
@@ -135,40 +110,16 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Mensaje de perfil privado (oculto por defecto) -->
+            <div id="privateProfileMessage" class="private-profile-message" style="display: none;">
+                <i class="fas fa-lock"></i>
+                <h2>Perfil Privado</h2>
+                <p>Este perfil es privado. Solo los amigos pueden ver el contenido completo.</p>
+            </div>
         </main>
     </div>
 
-    <!-- Modal de edición de perfil -->
-    <div id="editProfileModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Editar Perfil</h2>
-            <form id="editProfileForm">
-                <div class="form-group">
-                    <label for="editUsername">Nombre de usuario</label>
-                    <input type="text" id="editUsername" name="username" required>
-                </div>
-                <div class="form-group">
-                    <label for="editEmail">Email</label>
-                    <input type="email" id="editEmail" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="editBio">Biografía</label>
-                    <textarea id="editBio" name="bio"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="editPrivacy">Privacidad del perfil</label>
-                    <select id="editPrivacy" name="privacy">
-                        <option value="public">Público</option>
-                        <option value="friends">Solo amigos</option>
-                        <option value="private">Privado</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn-primary">Guardar cambios</button>
-            </form>
-        </div>
-    </div>
-
-    <script src="js/profile.js"></script>
+    <script src="js/user-profile.js"></script>
 </body>
 </html>
