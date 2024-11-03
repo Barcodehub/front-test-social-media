@@ -1,7 +1,7 @@
 // home.js
 
 // API Configuration
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'http://3.129.87.247:3000/api';
 let csrfToken = null;
 
 // Check authentication status
