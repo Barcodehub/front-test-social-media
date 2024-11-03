@@ -1,5 +1,5 @@
 // Constants
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'http://3.129.87.247:3000/api';
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB en bytes
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
