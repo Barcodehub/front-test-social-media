@@ -1,6 +1,6 @@
  
 // Configuración de la API
-const API_URL = 'http://localhost:3000/api/auth';
+const API_URL = 'http://3.129.87.247:3000/api/auth';
 let csrfToken = null;
 
 // Función para obtener el token CSRF
