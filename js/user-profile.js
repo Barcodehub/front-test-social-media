@@ -139,19 +139,26 @@ async function loadUserFriends(userId) {
 }
 
 
-async function loadUserCommunities() {
+async function loadUserCommunities(userId) {
     const communitiesContainer = document.getElementById('userCommunities');
     try {
-        const response = await fetch(`${API_BASE_URL}/communities/user`, { headers });
-        if (!response.ok) throw new Error('Error fetching communities');
+        // Si no se proporciona userId, usar el endpoint original para communities propios
+        const endpoint = userId 
+            ? `${API_BASE_URL}/communities/user/${userId}`
+            : `${API_BASE_URL}/communities/user`;
+            
+        const response = await fetch(endpoint, { headers });
+        if (!response.ok) throw new Error('Error fetching reels');
         
         const communities = await response.json();
         communitiesContainer.innerHTML = communities.map(community => createCommunityHTML(community)).join('');
     } catch (error) {
         console.error('Error loading communities:', error);
-        communitiesContainer.innerHTML = '<p>Error al cargar las comunidades</p>';
+        communitiesContainer.innerHTML = '<p>Error al cargar los communities</p>';
     }
 }
+
+
 
 const headers = {
     'X-CSRF-Token': csrfToken,
