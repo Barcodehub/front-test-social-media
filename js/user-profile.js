@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'http://3.129.87.247:3000/api';
 
 function showError(message) {
     // Implementa tu sistema de notificaciones aquí
