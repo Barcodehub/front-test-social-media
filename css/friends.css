@@ -1,0 +1,59 @@
+/* friends.css */
+.friends-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+  }
+  
+  .friend-requests-list {
+    margin-top: 20px;
+  }
+  
+  .friend-request {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .friend-request-buttons {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .accept-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .reject-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .accept-btn:hover {
+    background-color: #45a049;
+  }
+  
+  .reject-btn:hover {
+    background-color: #da190b;
+  }
+  
+  .no-requests {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+  }
