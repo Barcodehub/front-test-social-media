@@ -265,3 +265,12 @@
     max-width: 500px;
     width: 90%;
 }
+
+/* Clase para la imagen de perfil en los posts */
+.profile-pic {
+    width: 40px;            /* Ajusta el tamaño como necesites */
+    height: 40px;           /* Hace que la imagen sea cuadrada */
+    border-radius: 50%;     /* Para una imagen redonda */
+    object-fit: cover;      /* Ajusta la imagen para que llene el contenedor sin distorsionarse */
+    margin-right: 10px;     /* Espacio a la derecha para separarla del nombre del usuario */
+}

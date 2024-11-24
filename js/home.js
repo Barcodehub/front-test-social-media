@@ -4,6 +4,7 @@
 const API_URL = 'http://localhost:3000/api';
 let csrfToken = null;
 
+
 // Check authentication status
 function checkAuth() {
     const token = localStorage.getItem('token');
@@ -93,7 +94,7 @@ function renderPosts(posts) {
     postsFeed.innerHTML = posts.map(post => `
         <div class="post-card" data-post-id="${post._id}">
             <div class="post-header">
-                <img src="/api/placeholder/40/40" alt="${post.author.username}" class="profile-pic">
+                <img src="${post.author.profilePicture || '/assets/profile/default-profile.png'}" alt="${post.author.username}" class="profile-pic">
                 <div class="post-info">
                     <h4>${post.author.username}</h4>
                     <span class="post-time">${formatTimeAgo(post.createdAt)}</span>
@@ -239,10 +240,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!token) return;
     
     await getCsrfToken();
-    await loadUserData();
+   // await loadUserData();
     await loadNewsFeed();
     await loadStories();
-    await loadFriendRequests();
+   // await loadFriendRequests();
     
     setupEventListeners();
 });
