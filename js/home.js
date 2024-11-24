@@ -37,6 +37,13 @@ function getHeaders() {
     };
 }
 
+function getHeaders2() {
+    return {
+        'X-CSRF-Token': csrfToken,
+        'Authorization': `${localStorage.getItem('token')}`
+    };
+}
+
 // Load user data
 async function loadUserData() {
     try {
@@ -186,21 +193,6 @@ async function loadComments(postId) {
     }
 }
 
-// Create post
-async function createPost(content) {
-    try {
-        const response = await fetch(`${API_URL}/posts`, {
-            method: 'POST',
-            headers: getHeaders(),
-            body: JSON.stringify({ content })
-        });
-        const post = await response.json();
-        prependPost(post);
-        closeCreatePostModal();
-    } catch (error) {
-        console.error('Error creating post:', error);
-    }
-}
 
 // Friend requests
 async function loadFriendRequests() {
@@ -244,32 +236,70 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadNewsFeed();
     await loadStories();
    // await loadFriendRequests();
-    
-    setupEventListeners();
 });
 
+
+
+
+
+// Función para crear un post
+async function createPost(content) {
+    try {
+        console.log('content: '+content)
+        const response = await fetch(`${API_URL}/posts`, {
+            method: 'POST',
+            headers: getHeaders(),
+            credentials: 'include',
+            body: JSON.stringify({
+                content: content,
+                privacy: 'public' // Puedes modificar esto según tus necesidades
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al crear el post');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}
+
+// Agregar esto dentro de tu función setupEventListeners
 function setupEventListeners() {
-    // Create post modal
-    const createPostBtn = document.getElementById('create-post-btn');
-    const createPostModal = document.getElementById('createPostModal');
-    
-    createPostBtn.addEventListener('click', () => {
-        createPostModal.style.display = 'block';
+    // Event listener para el botón de publicar
+    const postInput = document.getElementById('post-input');
+    const postButton = document.getElementById('post-submit-btn');
+
+    postButton.addEventListener('click', async () => {
+        const content = postInput.value.trim();
+        
+        if (!content) {
+            alert('Por favor escribe algo antes de publicar');
+            return;
+        }
+
+        try {
+            const newPost = await createPost(content);
+            // Limpiar el input después de publicar
+            postInput.value = '';
+            
+            // Aquí puedes agregar código para mostrar el nuevo post en la interfaz
+            // Por ejemplo, actualizar la lista de posts o agregar el nuevo post al DOM
+            console.log('Post creado exitosamente:', newPost);
+            
+        } catch (error) {
+            alert('Error al crear el post. Por favor intenta de nuevo.');
+        }
     });
-    
-    // Logout
+
+    // Mantén el código existente del logout
     document.getElementById('logout-btn').addEventListener('click', () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userData');
         window.location.href = '/login.html';
     });
-    
-    // Post input
-    const postInput = document.getElementById('post-input');
-    postInput.addEventListener('click', () => {
-        createPostModal.style.display = 'block';
-    });
 }
-
-// Initialize
-setupEventListeners();
