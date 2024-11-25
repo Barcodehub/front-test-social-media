@@ -47,7 +47,7 @@ function getHeaders(isFileUpload = false) {
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         await loadCurrentProfilePicture();
-        setupEventListeners();
+        
     } catch (error) {
         console.error('Error durante la inicialización:', error);
         showError('Error al inicializar la aplicación');

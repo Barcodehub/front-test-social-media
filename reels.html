@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reels</title>
+  <link rel="stylesheet" href="css/reels.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/home.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+</head>
+<body>
+  <header class="main-header">
+
+    <div class="header-left">
+        <div class="logo">ShipConnect</div>
+        <div class="search-bar">
+            <input type="text" placeholder="Buscar...">
+           <!--  <i class="fas fa-search"></i> -->
+        </div>
+    </div>
+    <nav class="main-nav">
+        <a href="home.html" class="nav-item active"><i class="fas fa-home"></i></a>
+        <a href="reels.html" class="nav-item"><i class="fas fa-film"></i></a>
+        <a href="#" class="nav-item"><i class="fas fa-users"></i></a>
+        <a href="#" class="nav-item"><i class="fas fa-bell"></i></a>
+    </nav>
+    <div class="header-right">
+    
+        <div class="user-menu">
+            <br>
+            <div class="profile-picture">
+                <img 
+                class="profile-image profile-pic" 
+                src="/assets/profile/default-profile.png" 
+                alt="Foto de perfil"
+                >
+              </div>
+            <div class="dropdown-menu">
+                <a href="/profile.html">Mi Perfil</a>
+                <a href="/settings.html">Configuración</a>
+    
+    
+    
+    
+                
+                <a href="#" id="logout-btn">Cerrar Sesión</a>
+            </div>
+        </div>
+    </div>
+    </header>
+
+
+  <main>
+    <br><br><br>
+    <h1>Reels</h1>
+    <button class="btn btn-primary" id="openReelModal">
+      <i class="fas fa-plus"></i> Crear Reel
+  </button>
+    <div id="reels-container" class="reels-container">
+      <!-- Los reels se cargarán aquí dinámicamente -->
+    </div>
+  </main>
+
+
+<!-- Formu para crear reels:  -->
+<div id="reelModal" class="modal hidden">
+  <div class="modal-content">
+      <span class="close" id="closeReelModal">&times;</span>
+      <h2>Crear Reel</h2>
+      <form id="reelForm">
+          <label for="video">Sube un video:</label>
+          <input type="file" id="video" name="video" accept="video/*" required>
+          <label for="description">Descripción:</label>
+          <textarea id="description" name="description" placeholder="Escribe una descripción"></textarea>
+          <label for="privacy">Privacidad:</label>
+          <select id="privacy" name="privacy">
+              <option value="public">Público</option>
+              <option value="friends">Amigos</option>
+              <option value="private">Privado</option>
+          </select>
+          <button type="submit">Subir Reel</button>
+      </form>
+  </div>
+</div>
+  <script src="js/reels.js"></script>
+  <script src="js/landing.js"></script>
+
+
+</body>
+</html>

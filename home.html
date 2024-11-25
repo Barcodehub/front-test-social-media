@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ConnectApp - Home</title>
+    <title>ShipConnect - Home</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/home.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
@@ -12,23 +12,24 @@
     <div class="app-container">
         <!-- Header/Navbar -->
         <header class="main-header">
+
             <div class="header-left">
-                <div class="logo">ConnectApp</div>
+                <div class="logo">ShipConnect</div>
                 <div class="search-bar">
                     <input type="text" placeholder="Buscar...">
                     <i class="fas fa-search"></i>
                 </div>
             </div>
             <nav class="main-nav">
-                <a href="#" class="nav-item active"><i class="fas fa-home"></i></a>
-                <a href="#" class="nav-item"><i class="fas fa-film"></i></a>
+                <a href="home.html" class="nav-item active"><i class="fas fa-home"></i></a>
+                <a href="reels.html" class="nav-item"><i class="fas fa-film"></i></a>
                 <a href="#" class="nav-item"><i class="fas fa-users"></i></a>
                 <a href="#" class="nav-item"><i class="fas fa-bell"></i></a>
             </nav>
             <div class="header-right">
-                <button id="create-post-btn" class="btn btn-primary">
+           <!--      <button id="create-post-btn" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Crear
-                </button>
+                </button> -->
                 <div class="user-menu">
                     <br>
                     <div class="profile-picture">
@@ -41,16 +42,16 @@
                     <div class="dropdown-menu">
                         <a href="/profile.html">Mi Perfil</a>
                         <a href="/settings.html">Configuración</a>
-
-
-
-
+            
+            
+            
+            
                         
                         <a href="#" id="logout-btn">Cerrar Sesión</a>
                     </div>
                 </div>
             </div>
-        </header>
+            </header>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -157,17 +158,9 @@
         </main>
     </div>
 
-    <!-- Modals -->
-    <div id="createPostModal" class="modal">
-        <!-- Create post modal content -->
-    </div>
 
-    <div id="storyViewerModal" class="modal">
-        <!-- Story viewer modal content -->
-    </div>
-
-    
     <script src="js/home.js"></script>
     <script src="js/landing.js"></script>
+    
 </body>
 </html>

@@ -268,7 +268,16 @@ async function createPost(content) {
     }
 }
 
-// Agregar esto dentro de tu función setupEventListeners
+ document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        
+        setupEventListeners();
+    } catch (error) {
+        console.error('Error durante la inicialización:', error);
+        showError('Error al inicializar la aplicación');
+    }
+}); 
+ // Agregar esto dentro de tu función setupEventListeners
 function setupEventListeners() {
     // Event listener para el botón de publicar
     const postInput = document.getElementById('post-input');
@@ -302,4 +311,4 @@ function setupEventListeners() {
         localStorage.removeItem('userData');
         window.location.href = '/login.html';
     });
-}
+} 
