@@ -70,31 +70,191 @@ async function loadNewsFeed() {
     }
 }
 
-// Load stories
-async function loadStories() {
+let currentOffset = 0;
+const storiesPerPage = 4; // Cantidad máxima de historias visibles
+const storyWidth = 100; // Ancho de cada historia (incluido el margen/gap)
+const gap = 10;
+
+async function fetchStories() {
     try {
         const response = await fetch(`${API_URL}/stories`, {
-            headers: getHeaders()
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}` // Asegúrate de incluir el token si es necesario
+            }
         });
+
+        if (!response.ok) {
+            throw new Error('Error al obtener las historias');
+        }
+
         const stories = await response.json();
-        renderStories(stories);
+        renderStories(stories); // Renderiza las historias
+        updateNavButtons(stories.length); // Actualiza los botones de navegación
     } catch (error) {
-        console.error('Error loading news feed:', error);
+        console.error('Error al cargar las historias:', error.message);
     }
 }
 
 function renderStories(stories) {
     const storiesList = document.getElementById('storiesList');
-    storiesList.innerHTML = stories.map(story => `
-        <div class="story-item" onclick="viewStory('${story._id}')">
-            <img src="${story.mediaUrl || '/api/placeholder/120/200'}" alt="Story">
-            <div class="story-info">
-                <img src="/api/placeholder/30/30" alt="${story.author.username}" class="story-author-pic">
-                <span>${story.author.username}</span>
-            </div>
-        </div>
-    `).join('');
+    storiesList.innerHTML = ''; // Limpiar contenido previo
+
+    stories.forEach(story => {
+        const storyItem = document.createElement('div');
+        storyItem.className = 'story-item';
+
+        // Crea la imagen o contenido multimedia
+        const media = document.createElement('img');
+        media.src = story.mediaUrl; // Imagen por defecto si no hay contenido
+        media.alt = `${story.author.username}'s story`;
+
+        // Añade un overlay con el nombre del autor
+        const overlay = document.createElement('div');
+        overlay.className = 'story-overlay';
+        overlay.innerText = story.author.username;
+
+        storyItem.appendChild(media);
+        storyItem.appendChild(overlay);
+
+        // Agrega el evento de clic para abrir la historia
+        storyItem.addEventListener('click', () => {
+            openStory(story); // Función para manejar la visualización de la historia
+        });
+
+        storiesList.appendChild(storyItem);
+    });
 }
+
+
+function openStory(story) {
+    const storyModal = document.getElementById('storyModal');
+    const storyMedia = document.getElementById('storyMedia');
+    const storyAuthor = document.getElementById('storyAuthor');
+    const closeModal = document.getElementById('closeModal');
+
+    // Limpia contenido previo
+    storyMedia.innerHTML = '';
+    
+    // Muestra el contenido multimedia (imagen o video)
+    if (story.mediaUrl.endsWith('.mp4')) {
+        const video = document.createElement('video');
+        video.src = story.mediaUrl;
+        video.controls = true;
+        video.autoplay = true;
+        storyMedia.appendChild(video);
+    } else {
+        const img = document.createElement('img');
+        img.src = story.mediaUrl;
+        img.alt = `Historia de ${story.author.username}`;
+        storyMedia.appendChild(img);
+    }
+
+    // Muestra el autor
+    storyAuthor.textContent = `Historia de ${story.author.username}`;
+
+    // Muestra el modal
+    storyModal.classList.remove('hidden');
+
+    // Agrega evento para cerrar el modal
+    closeModal.onclick = () => {
+        storyModal.classList.add('hidden');
+    };
+
+    // También cierra el modal al hacer clic fuera de él
+    storyModal.onclick = (event) => {
+        if (event.target === storyModal) {
+            storyModal.classList.add('hidden');
+        }
+    };
+}
+
+function updateNavButtons(totalStories) {
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    const maxOffset = (Math.ceil(totalStories / storiesPerPage) - 1) * (storyWidth + gap) * storiesPerPage;
+
+    // Mostrar u ocultar botones según la posición actual
+    prevBtn.classList.toggle('hidden', currentOffset === 0);
+    nextBtn.classList.toggle('hidden', currentOffset >= maxOffset);
+}
+
+function scrollStories(direction) {
+    const storiesList = document.getElementById('storiesList');
+    const maxScroll = (storiesList.children.length - storiesPerPage) * (storyWidth + gap);
+
+    // Ajusta el offset basado en la dirección
+    currentOffset += direction * (storyWidth + gap) * storiesPerPage;
+
+    // Limitar dentro del rango permitido
+    currentOffset = Math.max(0, Math.min(currentOffset, maxScroll));
+
+    storiesList.style.transform = `translateX(-${currentOffset}px)`;
+
+    updateNavButtons(storiesList.children.length);
+}
+
+document.getElementById('prevBtn').addEventListener('click', () => scrollStories(-1));
+document.getElementById('nextBtn').addEventListener('click', () => scrollStories(1));
+
+// Llama a la función para cargar las historias al cargar la página
+document.addEventListener('DOMContentLoaded', fetchStories);
+
+
+
+
+
+// Función para mostrar el modal de creación de historias
+function showStoryModal() {
+    document.getElementById('story-modal').style.display = 'block';
+}
+
+// Función para ocultar el modal de creación de historias
+function hideStoryModal() {
+    document.getElementById('story-modal').style.display = 'none';
+}
+
+// Función para enviar la historia al backend
+async function submitStory() {
+    const content = document.getElementById('story-content').value;
+    const privacy = document.getElementById('story-privacy').value;
+    const mediaInput = document.getElementById('story-media');
+    const mediaFile = mediaInput.files[0];
+
+    const formData = new FormData();
+    formData.append('media', mediaFile);
+    formData.append('content', content);
+    formData.append('privacy', privacy);
+
+    try {
+        const response = await fetch(`${API_URL}/stories`, {
+            method: 'POST',
+            headers: getHeaders2(), // No necesitas establecer Content-Type para FormData
+            credentials: 'include',
+            body: formData,
+            
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al crear la historia');
+        }
+
+        const newStory = await response.json();
+        console.log('Nueva historia creada:', newStory);
+        // Aquí podrías actualizar la interfaz para mostrar la nueva historia
+        hideStoryModal();
+    } catch (error) {
+        console.error('Error al enviar la historia:', error);
+    }
+}
+
+// Eventos
+document.getElementById('create-story').addEventListener('click', showStoryModal);
+document.getElementById('submit-story').addEventListener('click', submitStory);
+document.getElementById('cancel-story').addEventListener('click', hideStoryModal);
+
+
 
 function renderPosts(posts) {
     const postsFeed = document.getElementById('postsFeed');
@@ -234,7 +394,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await getCsrfToken();
    // await loadUserData();
     await loadNewsFeed();
-    await loadStories();
+   // await loadStories();
    // await loadFriendRequests();
 });
 

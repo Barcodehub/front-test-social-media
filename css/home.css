@@ -115,20 +115,134 @@
 /* Stories Section */
 .stories-container {
     display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    max-width: 60%; /* Ajusta según tu diseño */
+    padding: 10px 0;
+}
+
+.stories-wrapper {
+    overflow: hidden;
+    width: 400px; /* Espacio para mostrar un máximo de 4 historias */
+}
+
+.stories-list {
+    display: flex;
     gap: 10px;
-    padding: 20px 0;
-    overflow-x: auto;
+    transition: transform 0.3s ease-in-out;
+    will-change: transform;
 }
 
 .story-item {
-    flex: 0 0 120px;
-    height: 200px;
+    width: 90px; /* Ajusta el tamaño según tu diseño */
+    height: 140px;
+    flex-shrink: 0;
     border-radius: 10px;
-    background-color: white;
-    position: relative;
-    cursor: pointer;
     overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    background-color: #f0f0f0; /* Fondo por defecto */
 }
+
+.story-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.story-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    text-align: center;
+    font-size: 12px;
+}
+
+.nav-btn {
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: absolute;
+    z-index: 10;
+}
+
+.nav-btn.hidden {
+    display: none;
+}
+
+.left-btn {
+    left: 5px;
+}
+
+.right-btn {
+    right: 5px;
+}
+.modal {
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7); /* Fondo semitransparente */
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Ajustar según tu diseño */
+    max-width: 500px;
+}
+
+.modal-stories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center; /* Centrar historias */
+}
+
+.modal-stories-list .story-item {
+    width: 100%;
+}
+
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    color: red;
+}
+
+#storyMedia img,
+#storyMedia video {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+.hidden {
+    display: none;
+}
+
 
 .create-story {
     display: flex;
@@ -147,6 +261,71 @@
     align-items: center;
     justify-content: center;
     color: white;
+}
+
+/* Estilos generales para el modal */
+#story-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Fondo semitransparente */
+    display: none; /* Oculto por defecto */
+    align-items: center; /* Centrar contenido verticalmente */
+    justify-content: center; /* Centrar contenido horizontalmente */
+    z-index: 1000; /* Asegurarse de que el modal esté por encima de otros elementos */
+}
+
+/* Contenedor del contenido del modal */
+#story-modal > div {
+    background-color: white; /* Fondo blanco para el contenido */
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%; /* Ancho responsivo */
+    max-width: 500px; /* Ancho máximo */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Sombra */
+}
+
+/* Estilo para el área de texto */
+#story-content {
+    width: 100%;
+    height: 100px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: none; /* Evitar redimensionamiento */
+}
+
+/* Estilo para los botones */
+#submit-story,
+#cancel-story {
+    background-color: #007bff; /* Color azul */
+    color: white; /* Texto blanco */
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px; /* Espacio entre botones */
+}
+
+#cancel-story {
+    background-color: #dc3545; /* Color rojo para el botón de cancelar */
+}
+
+/* Estilo para el botón de subir archivo */
+#story-media {
+    margin-bottom: 10px;
+}
+
+/* Estilo para el selector de privacidad */
+#story-privacy {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 /* Post Creation Card */
