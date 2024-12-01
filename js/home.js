@@ -265,81 +265,352 @@ function renderPosts(posts) {
                 <div class="post-info">
                     <h4>${post.author.username}</h4>
                     <span class="post-time">${formatTimeAgo(post.createdAt)}</span>
+                    ${
+                        post.shares.includes(getCurrentUserId())
+                            ? `<p class="shared-by">Compartido por ti</p>` // Indicar que fue compartido
+                            : ''
+                    }
                 </div>
-                ${post.author._id === getCurrentUserId() ? `
-                    <div class="post-options">
-                        <button onclick="showPostOptions('${post._id}')">
-                            <i class="fas fa-ellipsis-h"></i>
-                        </button>
-                    </div>
-                ` : ''}
             </div>
             <div class="post-content">
                 <p>${post.content}</p>
             </div>
             <div class="post-actions">
-                <button onclick="toggleLike('${post._id}')" class="action-btn ${post.likes.includes(getCurrentUserId()) ? 'liked' : ''}">
+                <button onclick="toggleLike('${post._id}', 'post')" class="action-btn ${post.likes.includes(getCurrentUserId()) ? 'liked' : ''}">
                     <i class="fas fa-heart"></i>
-                    <span>${post.likes.length}</span>
+                    <span class="likes-count">${post.likes.length}</span>
                 </button>
-                <button onclick="toggleComments('${post._id}')" class="action-btn">
+                <button onclick="handleComment('${post._id}')" class="comment-btn">
                     <i class="fas fa-comment"></i>
                     <span>${post.comments.length}</span>
                 </button>
+                <button class="view-comments-btn" onclick="handleComments('${post._id}')">
+                    <i class="fas fa-eye"></i>
+                </button>
                 <button onclick="sharePost('${post._id}')" class="action-btn">
                     <i class="fas fa-share"></i>
+                    <span class="share-count">${post.shares.length || 0}</span>
                 </button>
-            </div>
-            <div class="comments-section" id="comments-${post._id}" style="display: none;">
-                <div class="comments-list" id="comments-list-${post._id}"></div>
-                <div class="add-comment">
-                    <input type="text" placeholder="Añade un comentario..." id="comment-input-${post._id}">
-                    <button onclick="addComment('${post._id}')">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
             </div>
         </div>
     `).join('');
 }
 
+
 // Post interactions
-async function toggleLike(postId) {
+async function toggleLike(contentId, type) {
     try {
-        const response = await fetch(`${API_URL}/likes/post/${postId}`, {
+        const response = await fetch(`${API_URL}/likes/${type}/${contentId}`, {
             method: 'POST',
-            headers: getHeaders()
+            headers: getHeaders(),
+            credentials: 'include'
         });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al dar like');
+        }
+
         const result = await response.json();
-        updatePostLikes(postId, result.likes);
+        updateLikeButton(contentId, result.likes.length);
     } catch (error) {
         console.error('Error toggling like:', error);
     }
 }
 
-async function addComment(postId) {
-    const input = document.getElementById(`comment-input-${postId}`);
-    const content = input.value.trim();
-    
-    if (!content) return;
+function updateLikeButton(contentId, likesCount) {
+    const postCard = document.querySelector(`[data-post-id="${contentId}"]`);
+    if (postCard) {
+        const likesCountSpan = postCard.querySelector('.likes-count');
+        if (likesCountSpan) {
+            likesCountSpan.textContent = ` ${likesCount}`;
+        }
+    }
+}
 
+async function handleComments(postId) {
     try {
+        const comments = await getPostComments(postId);
+        showCommentsModal(comments);
+    } catch (error) {
+        console.error('Error:', error);
+        showError('Error al cargar los comentarios');
+    }
+}
+async function getPostComments(postId) {
+    try {
+        const response = await fetch(`${API_URL}/comments/${postId}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken,
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+        
+        if (!response.ok) throw new Error('Error al obtener comentarios');
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching comments:', error);
+        throw error;
+    }
+}
+
+
+
+// Función para mostrar comentarios en un modal
+function showCommentsModal(comments) {
+    const modalHTML = `
+        <div class="comments-modal" id="commentsModal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h3>Comentarios</h3>
+                <div class="comments-container">
+                    ${comments.length > 0 
+                        ? comments.map(comment => `
+                            <div class="comment">
+
+                              <div class="post-header">
+                            <img src="${comment.author.profilePicture || '/assets/profile/default-profile.png'}" alt="Profile" class="profile-pic">
+                            <div class="post-info">
+                               <strong>${comment.author.username}</strong>
+                                <p>${comment.content}</p>
+                                <small>${new Date(comment.createdAt).toLocaleDateString()}</small>
+                            </div>
+                        </div>
+                         </div>
+                        `).join('')
+                        : '<p>No hay comentarios aún</p>'
+                    }
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    const modal = document.getElementById('commentsModal');
+    const closeBtn = modal.querySelector('.close-modal');
+    
+    closeBtn.onclick = () => {
+        modal.remove();
+    };
+    
+    window.onclick = (event) => {
+        if (event.target === modal) {
+            modal.remove();
+        }
+    };
+}
+
+
+// Función principal para manejar la creación de comentarios
+async function handleComment(postId) {
+    // Verificar que tenemos el ID del post
+    if (!postId) {
+        showError('Error: ID del post no válido');
+        return;
+    }
+
+    // Verificar CSRF token antes de mostrar el modal
+    if (!getCsrfToken()) {
+        showError('Error de seguridad: Token CSRF no disponible');
+        return;
+    }
+
+    const modalHTML = `
+        <div class="comment-modal" id="commentModal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h3>Agregar Comentario</h3>
+                <div class="comment-form">
+                    <textarea id="commentContent" placeholder="Escribe tu comentario aquí..." rows="4"></textarea>
+                    <button id="submitComment" class="submit-btn">Publicar Comentario</button>
+                </div>
+                <div id="commentError" class="error-message" style="display: none;"></div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    const modal = document.getElementById('commentModal');
+    const closeBtn = modal.querySelector('.close-modal');
+    const submitBtn = document.getElementById('submitComment');
+    const textarea = document.getElementById('commentContent');
+    const errorDiv = document.getElementById('commentError');
+
+    // Manejadores de eventos
+    closeBtn.onclick = () => modal.remove();
+    
+    window.onclick = (event) => {
+        if (event.target === modal) modal.remove();
+    };
+
+    submitBtn.onclick = async () => {
+        const content = textarea.value.trim();
+        errorDiv.style.display = 'none';
+
+        if (!content) {
+            errorDiv.textContent = 'El comentario no puede estar vacío';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        try {
+            submitBtn.disabled = true;
+            const comment = await submitComment(postId, content);
+            
+            // Actualizar el contador de comentarios en el post
+            const postElement = document.querySelector(`[data-id="${postId}"]`);
+            if (postElement) {
+                const commentCountElement = postElement.querySelector('.comment-btn span');
+                if (commentCountElement) {
+                    const currentCount = parseInt(commentCountElement.textContent || '0');
+                    commentCountElement.textContent = ` ${currentCount + 1}`;
+                }
+            }
+            
+            modal.remove();
+            showSuccess('Comentario publicado exitosamente');
+            
+            // Opcional: Recargar los comentarios si están visibles
+            const commentsModal = document.getElementById('commentsModal');
+            if (commentsModal) {
+                const comments = await getPostComments(postId);
+                showCommentsModal(comments);
+            }
+        } catch (error) {
+            errorDiv.textContent = error.message || 'Error al publicar el comentario';
+            errorDiv.style.display = 'block';
+            submitBtn.disabled = false;
+        }
+    };
+}
+
+
+
+// Función para crear un comentario
+async function submitComment(postId, content) {
+    try {
+        // Verificar que tenemos todos los datos necesarios
+        if (!postId) {
+            throw new Error('ID del post es requerido');
+        }
+        
+        if (!content) {
+            throw new Error('Contenido del comentario es requerido');
+        }
+
+        // Verificar CSRF token
+        if (!getCsrfToken()) {
+            throw new Error('CSRF token no disponible');
+        }
+
+        // Alinear los campos con el controlador
         const response = await fetch(`${API_URL}/comments`, {
             method: 'POST',
             headers: getHeaders(),
+            credentials: 'include',
             body: JSON.stringify({
-                contentId: postId,
-                contentType: 'Post',
-                content
+                postId: postId,      // para el controlador
+                post: postId,        // para el modelo
+                content: content,    // contenido del comentario
+                contentId: postId,   // requerido por el modelo
+                contentType: 'Post'  // requerido por el modelo
             })
         });
-        const comment = await response.json();
-        appendComment(postId, comment);
-        input.value = '';
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.log('Error response:', errorData); // Para debugging
+            throw new Error(errorData.message || 'Error al crear el comentario');
+        }
+
+        return await response.json();
     } catch (error) {
-        console.error('Error adding comment:', error);
+        console.error('Error creating comment:', error);
+        throw error;
     }
 }
+
+
+
+// Función principal para compartir un post
+async function sharePost(postId) {
+    try {
+        // Verificar que se haya proporcionado el ID del post
+        if (!postId) {
+            showError('Error: ID del post no válido.');
+            return;
+        }
+
+        // Mostrar una notificación de carga
+        showLoading('Compartiendo post...');
+
+        // Enviar la solicitud al backend
+        const response = await fetch(`${API_URL}/posts/${postId}/share`, {
+            method: 'POST',
+            headers: getHeaders2(),
+            credentials: 'include',
+        });
+
+        // Manejo de errores en la respuesta
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Error al compartir el post:', errorData);
+            throw new Error(errorData.message || 'Error al compartir el post.');
+        }
+
+        // Obtener los datos del post actualizado
+        const updatedPost = await response.json();
+
+        // Actualizar la interfaz de usuario
+        updateShareCount(postId, updatedPost.shares.length);
+
+        // Mostrar éxito
+        showSuccess('Post compartido exitosamente.');
+    } catch (error) {
+        console.error('Error al compartir el post:', error);
+        showError(error.message || 'No se pudo compartir el post.');
+    } finally {
+        hideLoading(); // Ocultar la notificación de carga
+    }
+}
+
+// Función para actualizar el contador de compartidos en la interfaz
+function updateShareCount(postId, newShareCount) {
+    const postElement = document.querySelector(`[data-id="${postId}"]`);
+    if (postElement) {
+        const shareCountElement = postElement.querySelector('.action-btn span');
+        if (shareCountElement) {
+            shareCountElement.textContent = newShareCount;
+        } else {
+            // Si no hay un contador visible, puedes agregar uno dinámicamente
+            const newSpan = document.createElement('span');
+            newSpan.textContent = newShareCount;
+            postElement.querySelector('.action-btn').appendChild(newSpan);
+        }
+    }
+}
+
+// Funciones auxiliares (modifícalas según tu implementación)
+function showError(message) {
+    alert(`Error: ${message}`);
+}
+
+function showSuccess(message) {
+    alert(`Éxito: ${message}`);
+}
+
+function showLoading(message) {
+    console.log(message); // Puedes reemplazar esto con un spinner en tu UI
+}
+
+function hideLoading() {
+    console.log('Carga completada.'); // Similar a showLoading
+}
+
+
+
 
 async function loadComments(postId) {
     try {
@@ -399,7 +670,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 
-
+async function loadActiveFriends() {
+    try {
+      const response = await fetch(`${API_URL}/friends/active-friends`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      });
+  
+      const activeFriends = await response.json();
+      const activeFriendsList = document.getElementById('activeFriendsList');
+      activeFriendsList.innerHTML = '';
+  
+      activeFriends.forEach(friend => {
+        const friendItem = document.createElement('div');
+        friendItem.className = 'friend-item';
+        friendItem.innerHTML = `
+          <img src="${friend.profilePicture || '/assets/profile/default-profile.png'}" alt="${friend.username}" class="profile-pic">
+          <span>${friend.username}</span>
+        `;
+        activeFriendsList.appendChild(friendItem);
+      });
+    } catch (error) {
+      console.error('Error al cargar amigos activos:', error);
+    }
+  }
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    loadActiveFriends();
+  });
+  
 
 
 // Función para crear un post
@@ -466,9 +764,33 @@ function setupEventListeners() {
     });
 
     // Mantén el código existente del logout
-    document.getElementById('logout-btn').addEventListener('click', () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userData');
-        window.location.href = '/login.html';
+    
+
+
+
+// Agrega el event listener para el botón de logout
+document.getElementById('logout-btn').addEventListener('click', logoutUser);
+
+// Definición de la función logoutUser
+async function logoutUser() {
+  try {
+    const response = await fetch(`${API_URL}/auth/logout`, {
+        method: 'POST',
+        headers: getHeaders2(),
+        credentials: 'include',
     });
+    const result = await response.json();
+
+    if (result.status === 'success') {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userData');
+      window.location.href = '/login.html';
+    } else {
+      console.error('Error en el cierre de sesión:', result.message);
+    }
+  } catch (error) {
+    console.error('Error al cerrar sesión:', error);
+  }
+}
+      
 } 
