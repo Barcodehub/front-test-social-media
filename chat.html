@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link rel="stylesheet" href="css/chat.css">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <h2>Chat con Amigos</h2>
+        <div id="friendList" class="friend-list">
+            <!-- Lista de amigos se llenará aquí -->
+        </div>
+        <div class="chat-box">
+            <div id="messages" class="messages">
+                <!-- Los mensajes se llenarán aquí -->
+            </div>
+            <textarea id="messageInput" placeholder="Escribe un mensaje..."></textarea>
+            <button id="sendMessage">Enviar</button>
+        </div>
+
+        
+    </div>
+    <script src="js/chat.js"></script>
+</body>
+</html>
