@@ -85,3 +85,41 @@
     font-size: 0.9rem;
     margin-top: 0.5rem;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    color: #757575;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px 15px;
+    margin-top: 15px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.btn-google img {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+}
+
+.btn-google:hover {
+    background-color: #f5f5f5;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}

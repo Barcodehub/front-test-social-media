@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/2fa.css">
+    <title>Verificación 2FA</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Verificación de Dos Pasos</h1>
+        <form id="twoFactorForm">
+            <label for="token">Ingresa tu código de 2FA:</label>
+            <input type="text" id="token" required>
+            <button type="submit">Verificar</button>
+        </form>
+        <div id="error" class="error-message"></div>
+    </div>
+    <script src="js/2fa.js"></script>
+</body>
+</html>
