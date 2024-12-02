@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'https://ship-connect.ddns.net/api';
 
 function showError(message) {
     // Implementa tu sistema de notificaciones aquí

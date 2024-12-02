@@ -1,6 +1,6 @@
  
 // Configuración de la API
-const API_URL = 'http://localhost:3000/api/auth';
+const API_URL = 'https://ship-connect.ddns.net/api/auth';
 let csrfToken = null;
 
 // Obtener el token CSRF al cargar la página

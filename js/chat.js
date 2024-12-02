@@ -1,6 +1,6 @@
 // Socket.IO Real-Time Chat Implementation
-const API_URL = 'http://localhost:3000/api';
-const SOCKET_URL = 'http://localhost:3000'; // Update with your actual backend URL
+const API_URL = 'https://ship-connect.ddns.net/api';
+const SOCKET_URL = 'https://ship-connect.ddns.net'; // Update with your actual backend URL
 let socket;
 let csrfToken = null;
 let currentUserId = null; // Variable global
