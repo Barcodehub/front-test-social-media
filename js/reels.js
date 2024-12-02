@@ -16,7 +16,12 @@ async function getCsrfToken() {
   }
 }
 
+document.addEventListener('DOMContentLoaded', async () => {
 
+  
+  await getCsrfToken();
+
+});
 
 function getHeaders() {
     return {
@@ -136,8 +141,8 @@ async function handleReelCreation(e) {
     }
 
     try {
-
-      console.log("header: "+csrfToken+ getHeaders2)
+        getCsrfToken();
+      //console.log("header: "+csrfToken+ getHeaders2)
         // Llamada al backend
         const response = await fetch(`${API_URL}/reels`, {
             method: 'POST',
