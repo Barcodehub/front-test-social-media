@@ -87,7 +87,13 @@ function showImagePreview(file) {
     reader.readAsDataURL(file);
 }
 
+function redirectToLogin() {
+    window.location.href = "login.html";
+}
 
+function redirectToRegister() {
+    window.location.href = "register.html";
+}
 
 
 /* // Exportar funciones y variables
